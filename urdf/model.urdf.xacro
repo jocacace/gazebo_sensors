@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+
+<robot name="pendulum_robot" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+
+  <xacro:include filename="$(find realsense2_description)/urdf/_d435.urdf.xacro"/>
+  <xacro:arg name="use_nominal_extrinsics" default="true"/>
+  <xacro:arg name="add_plug" default="false" />
+  <xacro:arg name="use_mesh" default="true" />
+  
+  <link name="base_link">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	      <box size="0.2 0.2 0.2"/>
+      </geometry>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+	      <box size="0.2 0.2 0.2"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="100"/>
+      <inertia
+        ixx="1.0" ixy="0.0" ixz="0.0"
+        iyy="1.0" iyz="0.0"
+        izz="1.0"/>
+    </inertial>
+  </link>
+
+  <xacro:sensor_d435 parent="base_link" use_nominal_extrinsics="$(arg use_nominal_extrinsics)" add_plug="$(arg add_plug)" use_mesh="$(arg use_mesh)">
+    <origin xyz="0 0 0.3" rpy="0 0 0"/>
+  </xacro:sensor_d435>
+
+ 
+  <gazebo reference="base_link">
+    <sensor name="d435_color" type="camera">
+
+		  <always_on>1</always_on>
+			<update_rate>30</update_rate>
+			<visualize>1</visualize>
+			<pose>0 0.0175 0.5125 0 -0 0</pose>
+			<topic>/color_camera</topic>
+			<camera name="d435">
+				<horizontal_fov>1.21126</horizontal_fov>
+				<image>
+					<width>640</width>
+					<height>480</height>
+			  	<format>RGB_INT8</format>
+				</image>
+				<clip>
+					<near>0.1</near>
+					<far>100</far>
+				</clip>
+				<noise>
+					<type>gaussian</type>
+					<mean>0</mean>
+					<stddev>0.007</stddev>
+				</noise>
+			</camera>
+		</sensor>
+    <sensor name='d435_depth' type='depth_camera'>
+    								<ignition_frame_id>camera_link</ignition_frame_id>
+
+      <always_on>1</always_on>
+      <update_rate>90</update_rate>
+      <visualize>1</visualize>
+      <topic>/depth_camera</topic>
+      <pose>0 0.0175 0.5125 0 -0 0</pose>
+      <camera name='d435'>
+      								<ignition_frame_id>camera_link</ignition_frame_id>
+
+        <horizontal_fov>1.48702</horizontal_fov>
+        <image>
+          <width>1280</width>
+          <height>720</height>
+        </image>
+        <clip>
+          <near>0.1</near>
+          <far>100</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <mean>0</mean>
+          <stddev>0.1</stddev>
+        </noise>
+      </camera>
+
+				<plugin filename="libignition-gazebo-sensors-system.so" name="ignition::gazebo::systems::Sensors"> 
+								<ignition_frame_id>camera_link</ignition_frame_id>
+					<render_engine>ogre</render_engine>
+				</plugin>
+    </sensor> 
+  </gazebo>
+
+</robot>
